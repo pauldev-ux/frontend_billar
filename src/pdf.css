@@ -1,0 +1,45 @@
+.pdf-safe * {
+  color: #000 !important;
+  background-color: #fff !important;
+  box-shadow: none !important;
+  line-height: 1.6 !important;
+}
+
+
+.pdf-safe {
+  font-family: Arial, sans-serif !important;
+  line-height: 1.4 !important;
+  padding: 10px !important;
+}
+
+.pdf-card {
+  border: 1px solid #000 !important;
+  padding: 12px !important;
+  margin-bottom: 15px !important;
+  border-radius: 6px !important;
+}
+
+.pdf-title {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  margin-bottom: 10px !important;
+}
+
+.pdf-subtitle {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  margin-top: 10px !important;
+  margin-bottom: 6px !important;
+}
+
+.pdf-total {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  margin-top: 10px !important;
+}
+
+.pdf-safe hr {
+  border: none !important;
+  border-top: 1px solid #777 !important;
+  margin: 12px 0 !important;
+}
