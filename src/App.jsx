@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import Productos from "./pages/Productos";
 import Reportes from "./pages/Reportes";
 import Usuarios from "./pages/Usuarios";
+import Categorias from "./pages/Categorias";
+import InventarioPOS from "./pages/InventarioPOS";
 
 
 // Protecciones
@@ -66,6 +68,24 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <Usuarios />
+                </ProtectedRoute>
+              }
+            />
+
+             <Route
+              path="/categorias"
+              element={
+                <ProtectedRoute>
+                  <Categorias />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/inventariopos"
+              element={
+                <ProtectedRoute>
+                  <InventarioPOS />
                 </ProtectedRoute>
               }
             />

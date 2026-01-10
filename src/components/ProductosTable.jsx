@@ -11,6 +11,7 @@ export default function ProductosTable({ productos, onEditar, onEliminar, isAdmi
             <th className="p-3 text-left">ID</th>
             <th className="p-3 text-left">Imagen</th>
             <th className="p-3 text-left">Nombre</th>
+            <th className="p-3 text-left">Categoría</th> 
             {isAdmin && <th className="p-3 text-left">Compra</th>}
             <th className="p-3 text-left">Venta</th>
             <th className="p-3 text-left">Cantidad</th>
@@ -25,6 +26,11 @@ export default function ProductosTable({ productos, onEditar, onEliminar, isAdmi
             const imgSrc = p.imagen
               ? (p.imagen.startsWith("http") ? p.imagen : `${baseURL}${p.imagen}`)
               : null;
+
+            // ✅ Puede venir como:
+            // p.categoria = {id, nombre} (mejor)
+            // o p.categoria_id sin objeto (si backend no joinedload)
+            const catNombre = p?.categoria?.nombre || (p?.categoria_id ? `#${p.categoria_id}` : "Sin categoría");
 
             return (
               <tr
@@ -51,6 +57,12 @@ export default function ProductosTable({ productos, onEditar, onEliminar, isAdmi
                 </td>
 
                 <td className="p-3">{p.nombre}</td>
+
+                <td className="p-3">
+                  <span className="text-xs px-2 py-1 rounded-full border bg-gray-50 text-gray-700">
+                    {catNombre}
+                  </span>
+                </td>
 
                 {isAdmin && <td className="p-3">Bs {p.precio_compra}</td>}
 

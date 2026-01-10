@@ -26,7 +26,14 @@ crearProducto: async (data) => {
       formData.append("precio_compra", String(data.precio_compra));
       formData.append("precio_venta", String(data.precio_venta));
       formData.append("cantidad", String(data.cantidad));
+
+      // ✅ NUEVO
+      if (data.categoria_id !== null && data.categoria_id !== undefined && data.categoria_id !== "") {
+        formData.append("categoria_id", String(data.categoria_id));
+      }
+
       formData.append("imagen", data.imagenFile);
+
 
       await api.post("/productos/con-imagen", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -38,7 +45,11 @@ crearProducto: async (data) => {
         precio_compra: data.precio_compra,
         precio_venta: data.precio_venta,
         cantidad: data.cantidad,
-        imagen: data.imagen ?? null, // por si pegas URL
+        imagen: data.imagen ?? null,
+        categoria_id:
+        data.categoria_id === "" || data.categoria_id === undefined
+        ? null
+        : data.categoria_id,
       };
       await api.post("/productos/", payload);
     }
@@ -58,7 +69,11 @@ editarProducto: async (id, data) => {
       precio_compra: data.precio_compra,
       precio_venta: data.precio_venta,
       cantidad: data.cantidad,
-      imagen: data.imagen ?? null, // si usan URL directa
+      imagen: data.imagen ?? null, 
+      categoria_id:
+    data.categoria_id === "" || data.categoria_id === undefined
+      ? null
+      : data.categoria_id,
     };
 
     await api.put(`/productos/${id}`, payload);

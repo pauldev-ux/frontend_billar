@@ -16,9 +16,12 @@ export default function Topbar() {
   const items = [
     { to: "/dashboard", label: "Mesas", roles: ["admin", "empleado"] },
     { to: "/productos", label: "Inventario", roles: ["admin", "empleado"] },
+    { to: "/inventariopos", label: "Vender Productos", roles: ["admin", "empleado"] },
     { to: "/arqueo", label: "Arqueo de caja", roles: ["admin", "empleado"] },
     { to: "/usuarios", label: "Usuarios", roles: ["admin"] },
     { to: "/reportes", label: "Informe de arqueo", roles: ["admin", "empleado"] },
+    { to: "/categorias", label: "Categorias", roles: ["admin"] },
+
   ].filter((i) => i.roles.includes(user.rol));
 
   const handleLogout = () => {

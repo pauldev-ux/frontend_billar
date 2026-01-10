@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 
-export default function ProductoForm({ onSubmit, producto }) {
+export default function ProductoForm({ onSubmit, producto, categorias = [] }) {
   const [nombre, setNombre] = useState(producto?.nombre || "");
   const [precioCompra, setPrecioCompra] = useState(producto?.precio_compra ?? "");
   const [precioVenta, setPrecioVenta] = useState(producto?.precio_venta ?? "");
   const [cantidad, setCantidad] = useState(producto?.cantidad ?? "");
 
-  // imagen: puede venir como URL (string) desde BD
+  // ✅ NUEVO: categoria_id
+  const [categoriaId, setCategoriaId] = useState(
+  producto?.categoria_id != null
+    ? String(producto.categoria_id)
+    : (producto?.categoria?.id != null ? String(producto.categoria.id) : "")
+  );
+
+
+  // imagen URL / archivo
   const [imagenUrl, setImagenUrl] = useState(producto?.imagen ?? "");
-  // imagenFile: archivo seleccionado para subir
   const [imagenFile, setImagenFile] = useState(null);
 
   const preview = useMemo(() => {
@@ -16,6 +23,22 @@ export default function ProductoForm({ onSubmit, producto }) {
     if (imagenUrl) return imagenUrl;
     return "";
   }, [imagenFile, imagenUrl]);
+
+  useEffect(() => {
+    // si cambias de producto (editar otro), sincroniza
+    setNombre(producto?.nombre || "");
+    setPrecioCompra(producto?.precio_compra ?? "");
+    setPrecioVenta(producto?.precio_venta ?? "");
+    setCantidad(producto?.cantidad ?? "");
+    setImagenUrl(producto?.imagen ?? "");
+    setImagenFile(null);
+    setCategoriaId(
+      producto?.categoria_id != null
+        ? String(producto.categoria_id)
+        : (producto?.categoria?.id != null ? String(producto.categoria.id) : "")
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [producto?.id]);
 
   useEffect(() => {
     return () => {
@@ -27,21 +50,19 @@ export default function ProductoForm({ onSubmit, producto }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Por ahora: mandamos imagen como URL si no hay upload aún.
-    // Si seleccionas archivo, enviamos imagenFile también (para que luego lo maneje el store).
     onSubmit({
       nombre,
       precio_compra: Number(precioCompra) || 0,
       precio_venta: Number(precioVenta) || 0,
       cantidad: Number(cantidad) || 0,
-      imagen: (imagenUrl && imagenUrl.trim() !== "") ? imagenUrl.trim() : null,
-      imagenFile, // ✅ NUEVO (opcional)
-    });
-  };
 
-  const handleVer = () => {
-    if (!preview) return;
-    window.open(preview, "_blank", "noopener,noreferrer");
+      // ✅ NUEVO: manda categoria_id o null
+      categoria_id: categoriaId === "" ? null : Number(categoriaId),
+
+      // imagen
+      imagen: (imagenUrl && imagenUrl.trim() !== "") ? imagenUrl.trim() : null,
+      imagenFile,
+    });
   };
 
   return (
@@ -53,6 +74,26 @@ export default function ProductoForm({ onSubmit, producto }) {
         onChange={(e) => setNombre(e.target.value)}
         required
       />
+
+      {/* ✅ NUEVO: CATEGORIA */}
+      <div>
+        <label className="text-sm text-gray-600 block mb-1">Categoría</label>
+        <select
+          className="input"
+          value={categoriaId}
+          onChange={(e) => setCategoriaId(e.target.value)}
+        >
+          <option value="">Sin categoría</option>
+          {categorias.map((c) => (
+            <option key={c.id} value={String(c.id)}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500 mt-1">
+          Si no eliges, el producto quedará sin categoría.
+        </p>
+      </div>
 
       <input
         className="input"
@@ -81,7 +122,7 @@ export default function ProductoForm({ onSubmit, producto }) {
         required
       />
 
-      {/* Imagen: subir archivo */}
+      {/* Imagen */}
       <div className="flex flex-col gap-2">
         <label className="text-sm text-gray-600">Imagen</label>
 
@@ -97,11 +138,11 @@ export default function ProductoForm({ onSubmit, producto }) {
             <img src={preview} alt="preview" className="max-h-32 object-contain" />
           </div>
         )}
-
-        
       </div>
 
-      <button className="btn btn-primary bg-green-600  w-full text-white py-2 rounded-md mt-4 hover:bg-green-700 transition">Guardar</button>
+      <button className="btn btn-primary bg-green-600 w-full text-white py-2 rounded-md mt-4 hover:bg-green-700 transition">
+        Guardar
+      </button>
     </form>
   );
 }

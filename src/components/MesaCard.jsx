@@ -37,7 +37,7 @@ export default function MesaCard({ mesa, mesas, onIniciarTurno, onRefresh }) {
         }}
       >
         <h2 className="text-lg font-extrabold mb-1 tracking-tight">
-          Mesa {mesa.nombre}
+          {mesa.nombre}
         </h2>
 
         <p className="text-sm text-gray-600 font-bold">🕒 Tiempo real</p>
