@@ -31,7 +31,7 @@ export default function FacturaModal({ data, onClose }) {
       <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[90vh] overflow-y-auto">
 
         <div ref={facturaRef} className="p-4 border rounded mb-4 bg-white max-w-full">
-          <h1 className="text-center text-2xl font-bold mb-2">Billar Tio Chichi</h1>
+          <h1 className="text-center text-2xl font-bold mb-2">Billar POOL DERBY</h1>
           <p className="text-center text-sm mb-4">Comprobante de consumo</p>
 
           <hr className="my-2" />

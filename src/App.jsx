@@ -17,6 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Layouts
 import AutoLayout from "./layouts/AutoLayout";
+import Arqueo from "./pages/Arqueo";
 
 export default function App() {
   const { user, loadUser, loading } = useAuthStore();
@@ -86,6 +87,15 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <InventarioPOS />
+                </ProtectedRoute>
+              }
+            />
+
+             <Route
+              path="/arqueo"
+              element={
+                <ProtectedRoute>
+                  <Arqueo />
                 </ProtectedRoute>
               }
             />

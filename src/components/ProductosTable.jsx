@@ -81,12 +81,6 @@ export default function ProductosTable({ productos, onEditar, onEliminar, isAdmi
                       Editar
                     </button>
 
-                    <button
-                      className="px-4 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
-                      onClick={() => onEliminar(p.id)}
-                    >
-                      Eliminar
-                    </button>
                   </td>
                 )}
               </tr>

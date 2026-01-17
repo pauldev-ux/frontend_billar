@@ -71,11 +71,31 @@ export default function Reportes() {
     }
   };
 
-  const formatearHora = (fecha) =>
-    new Date(fecha).toLocaleTimeString("es-BO", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+// Convierte "2026-01-16 21:15:00" -> Date válido
+const parseDT = (s) => {
+  if (!s) return null;
+  if (s.includes("T")) return new Date(s);
+  return new Date(s.replace(" ", "T"));
+};
+
+const formatearFecha = (fecha) => {
+  const d = parseDT(fecha);
+  if (!d || isNaN(d.getTime())) return "N/D";
+  return d.toLocaleDateString("es-BO", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
+
+const formatearHora = (fecha) => {
+  const d = parseDT(fecha);
+  if (!d || isNaN(d.getTime())) return "N/D";
+  return d.toLocaleTimeString("es-BO", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
   const money = (n) => Number(n ?? 0).toFixed(2);
 
@@ -199,12 +219,16 @@ export default function Reportes() {
                     </p>
 
                     <p>
-                      <strong>Hora de inicio:</strong>{" "}
-                      {formatearHora(t.hora_inicio)}
+                      <strong>Facturado por:</strong>{" "} 
+                      {t.facturado_por ?? "N/D"}
+                    </p>
+
+
+                    <p>
+                      <strong>Inicio:</strong> {formatearFecha(t.hora_inicio)} — {formatearHora(t.hora_inicio)}
                     </p>
                     <p>
-                      <strong>Hora de fin:</strong>{" "}
-                      {formatearHora(t.hora_fin)}
+                      <strong>Fin:</strong> {formatearFecha(t.hora_fin)} — {formatearHora(t.hora_fin)}
                     </p>
 
                     <p>
