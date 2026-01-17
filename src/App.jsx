@@ -10,6 +10,7 @@ import Reportes from "./pages/Reportes";
 import Usuarios from "./pages/Usuarios";
 import Categorias from "./pages/Categorias";
 import InventarioPOS from "./pages/InventarioPOS";
+import Gastos from "./pages/Gastos";
 
 
 // Protecciones
@@ -96,6 +97,16 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <Arqueo />
+                </ProtectedRoute>
+              }
+            />
+
+
+            <Route
+              path="/gastos"
+              element={
+                <ProtectedRoute>
+                  <Gastos />
                 </ProtectedRoute>
               }
             />

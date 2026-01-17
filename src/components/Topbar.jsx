@@ -21,6 +21,8 @@ export default function Topbar() {
     { to: "/usuarios", label: "Usuarios", roles: ["admin"] },
     { to: "/reportes", label: "Informe de arqueo", roles: ["admin", "empleado"] },
     { to: "/categorias", label: "Categorias", roles: ["admin"] },
+    { to: "/gastos", label: "Gastos", roles: ["admin"] },
+
 
   ].filter((i) => i.roles.includes(user.rol));
 

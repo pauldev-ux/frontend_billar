@@ -136,12 +136,7 @@ export default function Categorias() {
                     Editar
                   </button>
 
-                  <button
-                    onClick={() => eliminar(cat)}
-                    className="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
-                  >
-                    Eliminar
-                  </button>
+                  
                 </div>
               </div>
             ))}
