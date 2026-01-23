@@ -135,6 +135,12 @@ export default function InventarioPOS() {
     return items.reduce((acc, it) => acc + it.precio_venta * it.cantidad, 0);
   }, [items]);
 
+
+  const totalItemsCarrito = useMemo(() => {
+  return items.reduce((acc, it) => acc + Number(it.cantidad || 0), 0);
+}, [items]);
+
+
   // =========================
   // Preview del turno al seleccionar mesa
   // =========================
@@ -223,6 +229,18 @@ export default function InventarioPOS() {
     return turnoPreview?.total_final ?? null;
   }, [turnoPreview]);
 
+  const itemsConsumidosTurno = useMemo(() => {
+  return (turnoPreview?.consumos || []).length;
+}, [turnoPreview]);
+
+const cantidadConsumidaTurno = useMemo(() => {
+  return (turnoPreview?.consumos || []).reduce(
+    (acc, c) => acc + Number(c.cantidad || 0),
+    0
+  );
+}, [turnoPreview]);
+
+
   return (
     <div className="p-4">
       {/* CATEGORÍAS */}
@@ -298,6 +316,11 @@ export default function InventarioPOS() {
                     Bs <span className="font-bold">{p.precio_venta}</span>
                   </div>
 
+                  <p className="text-xs text-gray-600 mt-1">
+                    Stock: <strong>{Number(p.cantidad ?? 0)}</strong>
+                  </p>
+
+
                   <button
                     onClick={() => addToCart(p)}
                     className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
@@ -372,10 +395,22 @@ export default function InventarioPOS() {
                 <p className="text-xs text-gray-600 mt-1">Sin datos.</p>
               ) : (
                 <>
+
                   <p className="text-xs text-gray-600 mt-1">
                     Productos:{" "}
                     <strong>Bs {Number(turnoPreview.subtotal_productos || 0).toFixed(2)}</strong>
                   </p>
+
+                  {/* ✅ NUEVO */}
+                  <p className="text-xs text-gray-600">
+                    Ítems consumidos: <strong>{itemsConsumidosTurno}</strong>
+                  </p>
+
+                  {/* ✅ NUEVO */}
+                  <p className="text-xs text-gray-600">
+                    Cantidad total: <strong>{cantidadConsumidaTurno}</strong>
+                  </p>
+
                   <p className="text-xs text-gray-600">
                     Total actual:{" "}
                     <strong className="text-blue-700">
@@ -392,6 +427,7 @@ export default function InventarioPOS() {
                       ))}
                     </ul>
                   )}
+
 
                   {turnoPreview.consumos?.length === 0 && (
                     <p className="text-xs text-gray-600 mt-2">Sin consumos aún.</p>
@@ -479,9 +515,15 @@ export default function InventarioPOS() {
             {/* Totales */}
             <div className="border-t mt-4 pt-3">
               <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">Cantidad carrito</span>
+                <span className="font-bold">{totalItemsCarrito}</span>
+              </div>
+
+              <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-600">Total carrito</span>
                 <span className="font-bold">Bs {subtotalNuevo.toFixed(2)}</span>
               </div>
+
 
               {/* ✅ extra: total final estimado (turno actual + carrito) */}
               {totalTurnoActual !== null && (

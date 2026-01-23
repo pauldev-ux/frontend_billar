@@ -71,6 +71,35 @@ export default function Reportes() {
     }
   };
 
+
+
+const diffMin = (ini, fin) => {
+  const a = parseDT(ini);
+  const b = parseDT(fin);
+  if (!a || !b || isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
+  return Math.max(0, Math.floor((b - a) / 60000));
+};
+
+const minutosEfectivosTurno = (t) => {
+  const bruto = diffMin(t.hora_inicio, t.hora_fin);
+
+  // ✅ intenta leer pausa acumulada si el backend la manda
+  const pausaSeg =
+    Number(t.pausa_acumulada_seg ?? t.pausa_total_seg ?? 0);
+
+  const pausaMin = Math.floor(pausaSeg / 60);
+
+  // si no existe pausa en el reporte, cae al bruto (o al tiempo_total_min)
+  const efectivo = bruto - pausaMin;
+
+  // fallback si no llegan fechas
+  if (!t.hora_inicio || !t.hora_fin) return Number(t.tiempo_total_min ?? 0);
+
+  return Math.max(0, efectivo);
+};
+
+
+
 // Convierte "2026-01-16 21:15:00" -> Date válido
 const parseDT = (s) => {
   if (!s) return null;
@@ -231,10 +260,12 @@ const formatearHora = (fecha) => {
                       <strong>Fin:</strong> {formatearFecha(t.hora_fin)} — {formatearHora(t.hora_fin)}
                     </p>
 
+                    {/*
                     <p>
-                      <strong>Tiempo jugado:</strong> {t.tiempo_total_min}{" "}
+                      <strong>Tiempo jugado:</strong> {minutosEfectivosTurno(t)}
                       minutos
                     </p>
+                    */}
 
                     <p>
                       <strong>Tiempo Bs:</strong> {money(t.subtotal_tiempo)} Bs

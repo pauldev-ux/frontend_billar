@@ -42,6 +42,11 @@ export default function Mesas() {
     alert("La factura se genera desde la vista de Facturación.");
   };
 
+  const mesasOrdenadas = [...mesas].sort((a, b) =>
+  (a.nombre || "").localeCompare(b.nombre || "", "es", { numeric: true, sensitivity: "base" })
+);
+
+
   return (
     <div className="p-6">
       {/* HEADER */}
@@ -60,7 +65,7 @@ export default function Mesas() {
 
       {/* GRID DE MESAS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {mesas.map((m) => {
+        {mesasOrdenadas.map((m) => {
           const bg = getMesaImageUrl(m.imagen);
 
           return (

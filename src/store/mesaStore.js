@@ -1,3 +1,4 @@
+// src/store/mesaStore.js
 import { create } from "zustand";
 import api from "../api/api";
 
@@ -9,7 +10,6 @@ export const useMesaStore = create((set, get) => ({
 
   cargarMesas: async () => {
     if (get().bloquearActualizacion) return;
-
     const res = await api.get("/mesas/");
     set({ mesas: res.data });
   },
@@ -24,6 +24,7 @@ export const useMesaStore = create((set, get) => ({
       descuento: Number(descuento),
       servicios_extras: Number(servicios_extras),
     });
+    await get().cargarMesas();
     return res.data;
   },
 
@@ -40,7 +41,19 @@ export const useMesaStore = create((set, get) => ({
     return res.data;
   },
 
-  // ✅ OPCIONAL: centralizar transferencia en store
+  // ✅ NUEVO: pausar turno
+  pausarTurno: async (turno_id) => {
+    await api.patch(`/turnos/${turno_id}/pausar`);
+    await get().cargarMesas();
+  },
+
+  // ✅ NUEVO: reanudar turno
+  reanudarTurno: async (turno_id) => {
+    await api.patch(`/turnos/${turno_id}/reanudar`);
+    await get().cargarMesas();
+  },
+
+  // ✅ Transferir turno (abierto o pausado)
   transferirTurno: async (mesa_origen_id, mesa_destino_id) => {
     await api.patch(`/turnos/transferir/${mesa_origen_id}`, {
       mesa_destino_id,

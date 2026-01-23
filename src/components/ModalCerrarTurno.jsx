@@ -15,9 +15,17 @@ export default function ModalCerrarTurno({ turnoId, mesaNombre, onClose }) {
   //       CARGAR PREVIEW
   // ==========================
   useEffect(() => {
-    if (!turnoId) return;
-    cargarPreview();
-  }, []);
+  if (!turnoId) return;
+
+  setBloquearActualizacion(true);   // ✅ bloquear apenas abre
+  cargarPreview();
+
+  return () => {
+    setBloquearActualizacion(false); // ✅ si se cierra/desmonta, desbloquea
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [turnoId]);
+
 
   const cargarPreview = async () => {
     try {
@@ -31,16 +39,34 @@ export default function ModalCerrarTurno({ turnoId, mesaNombre, onClose }) {
   // ==========================
   //     CALCULAR TIEMPO
   // ==========================
-  const calcularMinutosJugados = () => {
-    if (!preview?.hora_inicio) return 0;
+const calcularSegundosEfectivos = () => {
+  if (!preview?.hora_inicio) return 0;
 
-    // Soporta formato ISO: "2025-11-23T23:02:57"
-    const inicio = new Date(preview.hora_inicio);
-    const ahora = new Date();
+  const inicio = new Date(preview.hora_inicio);
+  const ahora = new Date();
 
-    const diffMs = ahora - inicio;
-    return Math.floor(diffMs / 60000);
-  };
+  // total desde inicio (seg)
+  const total = Math.floor((ahora - inicio) / 1000);
+
+  // pausas ya acumuladas
+  let pausaTotal = Number(preview.pausa_acumulada_seg || 0);
+
+  // si sigue pausado AHORA, sumar lo que va de esta pausa
+  // (preview.estado == "pausado" y preview.pausa_inicio existe)
+  if (preview.estado === "pausado" && preview.pausa_inicio) {
+    const pausaInicio = new Date(preview.pausa_inicio);
+    pausaTotal += Math.floor((ahora - pausaInicio) / 1000);
+  }
+
+  const efectivos = total - pausaTotal;
+  return efectivos > 0 ? efectivos : 0;
+};
+
+const calcularMinutosJugados = () => {
+  const seg = calcularSegundosEfectivos();
+  return Math.floor(seg / 60);
+};
+
 
   const calcularSubtotalTiempo = () => {
     if (!preview) return 0;
@@ -65,42 +91,44 @@ export default function ModalCerrarTurno({ turnoId, mesaNombre, onClose }) {
   // ==========================
   //       FINALIZAR TURNO
   // ==========================
-  const finalizarTurno = async () => {
-    try {
-      const minutosJugados = calcularMinutosJugados();
-      const subtotalTiempo = calcularSubtotalTiempo();
+const finalizarTurno = async () => {
+  try {
+    const segundosEfectivos = calcularSegundosEfectivos(); // ✅ AQUÍ
+    const minutosJugados = Math.floor(segundosEfectivos / 60);
 
-      await terminarTurno(turnoId, descuento, extras);
+    // 👇 cobramos con BACKEND (pero ojo punto #2)
+    const subtotalTiempo = Number(preview.subtotal_tiempo || 0);
 
-      setBloquearActualizacion(true);
+    const res = await terminarTurno(turnoId, descuento, extras); // ✅ guarda respuesta
 
-      const factura = {
-        mesa: mesaNombre,
-        minutosJugados,
-        tiempoTexto: `${Math.floor(minutosJugados / 60)}h ${minutosJugados % 60}m`,
-        subtotalTiempo,
-        subtotalProductos: preview.subtotal_productos,
-        productos: preview.consumos,
-        descuento: Number(descuento),
-        extras: Number(extras),
-        observaciones: observaciones,
-        total:
-          subtotalTiempo +
-          preview.subtotal_productos -
-          Number(descuento) +
-          Number(extras),
-      };
+    // ✅ usar lo que devuelve el backend al cerrar (más confiable)
+    const subtotalTiempoFinal = Number(res.subtotal_tiempo || subtotalTiempo);
+    const subtotalProductosFinal = Number(res.subtotal_productos || preview.subtotal_productos);
 
-      setFacturaData(factura);
-    } catch (error) {
-      console.error("Error al cerrar turno:", error);
-    }
-  };
+    const factura = {
+      mesa: mesaNombre,
+      minutosJugados,
+      tiempoTexto: `${Math.floor(minutosJugados / 60)}h ${minutosJugados % 60}m`,
+      subtotalTiempo: subtotalTiempoFinal,
+      subtotalProductos: subtotalProductosFinal,
+      productos: res.consumos ?? preview.consumos,
+      descuento: Number(descuento),
+      extras: Number(extras),
+      observaciones,
+      total: subtotalTiempoFinal + subtotalProductosFinal - Number(descuento) + Number(extras),
+    };
+
+    setFacturaData(factura);
+  } catch (error) {
+    console.error("Error al cerrar turno:", error);
+  }
+};
+
 
   if (!preview) return null;
 
   const minutosJugados = calcularMinutosJugados();
-  const subtotalTiempoFront = calcularSubtotalTiempo();
+  const subtotalTiempoFront = Number(preview.subtotal_tiempo || 0);
   const totalFront =
     subtotalTiempoFront +
     preview.subtotal_productos -

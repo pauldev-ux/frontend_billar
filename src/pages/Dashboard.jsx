@@ -26,6 +26,11 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [bloquearActualizacion, cargarMesas]);
 
+  const mesasOrdenadas = [...mesas].sort((a, b) =>
+  (a.nombre || "").localeCompare(b.nombre || "", "es", { numeric: true, sensitivity: "base" })
+);
+
+
   return (
     <>
       {/* HEADER */}
@@ -42,16 +47,17 @@ export default function Dashboard() {
 
       {/* GRID DE MESAS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        {mesas.map((mesa) => (
-          <MesaCard
-            key={mesa.id}
-            mesa={mesa}
-            mesas={mesas}                // ✅ PASAMOS TODAS LAS MESAS (para elegir destino)
-            onIniciarTurno={iniciarTurno}
-            onTerminarTurno={terminarTurno}
-            onRefresh={cargarMesas}      // ✅ REFRESH REAL al transferir
-          />
-        ))}
+        {mesasOrdenadas.map((mesa) => (
+        <MesaCard
+          key={mesa.id}
+          mesa={mesa}
+          mesas={mesasOrdenadas}
+          onIniciarTurno={iniciarTurno}
+          onTerminarTurno={terminarTurno}
+          onRefresh={cargarMesas}
+        />
+      ))}
+
       </div>
 
       {showCrear && (
